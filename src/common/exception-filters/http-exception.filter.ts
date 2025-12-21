@@ -145,7 +145,7 @@ Message        : ${status >= 500 ? stack : JSON.stringify(message)}
 =============================== Close ============================== [${logMeta.reqId}]
 `;
     } else {
-      errorReqeustAndResponseLog = `[${request.method} ${request.url}] StatusCode: ${status} Message: ${JSON.stringify(message)}`;
+      errorReqeustAndResponseLog = `[${request.method} ${request.url}] StatusCode: ${status} Code: ${code} Message: ${JSON.stringify(message)}`;
     }
 
     /**
