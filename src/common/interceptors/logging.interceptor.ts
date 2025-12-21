@@ -17,6 +17,8 @@ export class LoggingInterceptor implements NestInterceptor {
     const request = context.switchToHttp().getRequest();
     const { method, url, ip, headers, body, query } = request;
 
+    const isMultipart = typeof request.headers['content-type'] === 'string' && request.headers['content-type'].includes('multipart/form-data');
+
     const reqId = Math.floor(Math.random() * 100000)
       .toString()
       .padStart(6, '0');
@@ -60,7 +62,7 @@ IP             : ${ip}
 Method         : ${method}
 URL            : ${url}
 Query          : ${JSON.stringify(query)}
-Body           : ${JSON.stringify(body)}
+Body           : ${isMultipart ? '[Multipart Form Data]' : JSON.stringify(body)}
 `
     });
 
@@ -68,6 +70,16 @@ Body           : ${JSON.stringify(body)}
       tap((responseBody) => {
         const duration = (Date.now() - start).toFixed(3);
         const response = context.switchToHttp().getResponse();
+        if (isMultipart) {
+          this.logger.log({
+            level: 'info',
+            message: `
+============================= FormData ============================= [${reqId}]
+Fields         : ${JSON.stringify(request.body)}
+Files          : ${this.formatFileMeta(request.files)}
+`
+          });
+        }
 
         this.logger.log({
           level: 'info',
@@ -80,6 +92,33 @@ Response-Body  : ${JSON.stringify(responseBody)}
         `
         });
       })
+    );
+  }
+
+  private formatFileMeta(files: any) {
+    if (!files) return '-';
+
+    if (Array.isArray(files)) {
+      return JSON.stringify(
+        files.map((f) => ({
+          field: f.fieldname,
+          name: f.originalname,
+          size: f.size,
+          type: f.mimetype
+        }))
+      );
+    }
+
+    return JSON.stringify(
+      Object.entries(files).map(([field, list]: any) => ({
+        field,
+        count: list.length,
+        files: list.map((f: any) => ({
+          name: f.originalname,
+          size: f.size,
+          type: f.mimetype
+        }))
+      }))
     );
   }
 }
