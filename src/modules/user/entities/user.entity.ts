@@ -3,21 +3,18 @@ import { Exclude } from 'class-transformer';
 import { BaseEntity } from '../../../common/entities/base.entity';
 
 // 사용자 엔티티
-@Entity()
+@Entity({ comment: '사용자' })
 export class User extends BaseEntity {
-  @Column({ type: 'varchar', length: 255, unique: true })
+  @Column({ type: 'varchar', length: 255, unique: true, comment: '이메일 (로그인 ID)' })
   email: string;
 
-  @Column({ type: 'varchar', length: 255 })
+  @Column({ type: 'varchar', length: 255, comment: '비밀번호 (암호화)' })
   @Exclude()
   password: string;
 
-  @Column({ type: 'varchar', length: 100 })
+  @Column({ type: 'varchar', length: 100, comment: '사용자 이름' })
   name: string;
 
-  @Column({ type: 'varchar', length: 500, nullable: true })
-  profileImage: string | null;
-
-  @Column({ type: 'boolean', default: true })
+  @Column({ type: 'boolean', default: true, comment: '활성화 여부' })
   isActive: boolean;
 }

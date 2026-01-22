@@ -7,15 +7,15 @@ import {
 
 // 공통 Base Entity
 export abstract class BaseEntity {
-  @PrimaryGeneratedColumn()
+  @PrimaryGeneratedColumn({ comment: '고유 식별자' })
   id: number;
 
-  @CreateDateColumn()
+  @CreateDateColumn({ comment: '생성일시' })
   createdAt: Date;
 
-  @UpdateDateColumn()
+  @UpdateDateColumn({ comment: '수정일시' })
   updatedAt: Date;
 
-  @DeleteDateColumn({ nullable: true })
+  @DeleteDateColumn({ nullable: true, comment: '삭제일시 (Soft Delete)' })
   deletedAt: Date | null;
 }

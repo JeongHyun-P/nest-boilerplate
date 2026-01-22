@@ -2,12 +2,18 @@ import { ApiProperty } from '@nestjs/swagger';
 
 // 로그인/회원가입 응답 (Access Token만 반환, Refresh Token은 쿠키)
 export class TokenResponseDto {
-  @ApiProperty({ description: 'Access Token' })
+  @ApiProperty({ description: 'Access Token', example: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...' })
   accessToken: string;
 }
 
 // 토큰 갱신 응답
 export class RefreshTokenResponseDto {
-  @ApiProperty({ description: '새로운 Access Token' })
+  @ApiProperty({ description: '새로운 Access Token', example: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...' })
   accessToken: string;
+}
+
+// 로그아웃 응답
+export class LogoutResponseDto {
+  @ApiProperty({ description: '로그아웃 성공 여부', example: true })
+  success: boolean;
 }

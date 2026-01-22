@@ -1,10 +1,12 @@
 import { Module, Global } from '@nestjs/common';
+import { FileController } from './controllers/file.controller';
 import { FileService } from './file.service';
 import { S3Service } from './s3.service';
 
 // 파일 모듈 (전역)
 @Global()
 @Module({
+  controllers: [FileController],
   providers: [FileService, S3Service],
   exports: [FileService],
 })

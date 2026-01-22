@@ -27,7 +27,7 @@ export class AuthService {
     private readonly dataSource: DataSource,
     private readonly userRepository: UserRepository,
     private readonly adminRepository: AdminRepository,
-    private readonly mailService: MailService,
+    private readonly mailService: MailService
   ) {
     const serviceName = this.configService.get<string>('serviceName') || 'nest-app';
     this.refreshTokenCookie = `${serviceName}_URT`;
@@ -72,7 +72,7 @@ export class AuthService {
     if (!user) {
       throw new CustomException({
         statusCode: HttpStatus.UNAUTHORIZED,
-        ...ErrorCode.INVALID_CREDENTIALS
+        ...ErrorCode.USER_NOT_FOUND
       });
     }
 
@@ -89,7 +89,7 @@ export class AuthService {
     if (!admin) {
       throw new CustomException({
         statusCode: HttpStatus.UNAUTHORIZED,
-        ...ErrorCode.INVALID_CREDENTIALS
+        ...ErrorCode.USER_NOT_FOUND
       });
     }
 
@@ -103,19 +103,19 @@ export class AuthService {
     if (!refreshToken) {
       throw new CustomException({
         statusCode: HttpStatus.UNAUTHORIZED,
-        ...ErrorCode.INVALID_TOKEN,
+        ...ErrorCode.INVALID_TOKEN
       });
     }
 
     try {
       const payload = this.jwtService.verify<JwtPayload & { exp: number }>(refreshToken, {
-        secret: this.configService.get('jwt.secret'),
+        secret: this.configService.get('jwt.secret')
       });
 
       const newPayload: JwtPayload = {
         sub: payload.sub,
         email: payload.email,
-        role: payload.role,
+        role: payload.role
       };
 
       // Refresh Token 남은 시간 확인 후 갱신 여부 결정
@@ -129,13 +129,13 @@ export class AuthService {
       }
 
       return {
-        accessToken: this.generateAccessToken(newPayload),
+        accessToken: this.generateAccessToken(newPayload)
       };
     } catch {
       this.clearRefreshTokenCookie(res);
       throw new CustomException({
         statusCode: HttpStatus.UNAUTHORIZED,
-        ...ErrorCode.INVALID_TOKEN,
+        ...ErrorCode.INVALID_TOKEN
       });
     }
   }
@@ -167,12 +167,7 @@ export class AuthService {
   }
 
   // 토큰 발급 + 쿠키 설정
-  private generateTokensWithCookie(
-    userId: number,
-    email: string,
-    role: Role,
-    res: Response
-  ): TokenResponseDto {
+  private generateTokensWithCookie(userId: number, email: string, role: Role, res: Response): TokenResponseDto {
     const payload: JwtPayload = { sub: userId, email, role };
 
     const accessToken = this.generateAccessToken(payload);
@@ -193,7 +188,7 @@ export class AuthService {
       secure: isProduction,
       sameSite: isProduction ? 'strict' : 'lax',
       maxAge: this.refreshTokenMaxAge,
-      path: '/',
+      path: '/'
     });
   }
 
@@ -211,11 +206,16 @@ export class AuthService {
     const unit = match[2];
 
     switch (unit) {
-      case 's': return value * 1000;
-      case 'm': return value * 60 * 1000;
-      case 'h': return value * 60 * 60 * 1000;
-      case 'd': return value * 24 * 60 * 60 * 1000;
-      default: return 30 * 24 * 60 * 60 * 1000;
+      case 's':
+        return value * 1000;
+      case 'm':
+        return value * 60 * 1000;
+      case 'h':
+        return value * 60 * 60 * 1000;
+      case 'd':
+        return value * 24 * 60 * 60 * 1000;
+      default:
+        return 30 * 24 * 60 * 60 * 1000;
     }
   }
 
@@ -235,7 +235,7 @@ export class AuthService {
     if (!isValid) {
       throw new CustomException({
         statusCode: HttpStatus.UNAUTHORIZED,
-        ...ErrorCode.INVALID_CREDENTIALS
+        ...ErrorCode.USER_NOT_FOUND
       });
     }
   }

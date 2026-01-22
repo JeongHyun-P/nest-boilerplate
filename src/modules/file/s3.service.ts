@@ -67,10 +67,9 @@ export class S3Service {
 
       return {
         key,
-        url: `https://${this.bucket}.s3.${this.region}.amazonaws.com/${key}`,
         originalName: file.originalname,
         size: file.size,
-        mimeType: file.mimetype
+        contentType: file.mimetype
       };
     } catch (error) {
       this.logger.error('S3 업로드 실패', error);

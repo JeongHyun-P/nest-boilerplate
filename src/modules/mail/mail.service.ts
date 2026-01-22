@@ -4,7 +4,8 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, In, LessThan } from 'typeorm';
 import * as nodemailer from 'nodemailer';
 import { Transporter } from 'nodemailer';
-import { MailHistory, MailStatus } from './entities/mail-history.entity';
+import { MailHistory } from './entities/mail-history.entity';
+import { MailStatus } from './enums/mail-status.enum';
 
 // 메일 서비스
 @Injectable()

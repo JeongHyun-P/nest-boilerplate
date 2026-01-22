@@ -5,6 +5,7 @@ import { UserResponseDto } from '../../user/dto/response.dto';
 import { PaginationDto, PaginatedResponseDto } from '../../../common/dto/pagination.dto';
 import { Roles } from '../../../common/decorators/roles.decorator';
 import { Role } from '../../../common/constants/role.enum';
+import { ApiPaginatedResponse, ApiCommonErrorResponses } from '../../../common/decorators/api-response.decorator';
 
 // 관리자 컨트롤러
 @ApiTags('Admins')
@@ -16,6 +17,8 @@ export class AdminController {
 
   @Get('users')
   @ApiOperation({ summary: '사용자 목록 조회' })
+  @ApiPaginatedResponse(UserResponseDto)
+  @ApiCommonErrorResponses()
   async getUsers(@Query() dto: PaginationDto): Promise<PaginatedResponseDto<UserResponseDto>> {
     return this.adminService.getUsers(dto.page, dto.limit);
   }
