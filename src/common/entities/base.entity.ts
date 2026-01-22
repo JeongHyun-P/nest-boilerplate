@@ -1,17 +1,21 @@
-import { Exclude } from 'class-transformer';
-import { CreateDateColumn, DeleteDateColumn, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
+import {
+  CreateDateColumn,
+  UpdateDateColumn,
+  DeleteDateColumn,
+  PrimaryGeneratedColumn
+} from 'typeorm';
 
+// 공통 Base Entity
 export abstract class BaseEntity {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @CreateDateColumn({ type: 'timestamp' })
+  @CreateDateColumn()
   createdAt: Date;
 
-  @UpdateDateColumn({ type: 'timestamp' })
+  @UpdateDateColumn()
   updatedAt: Date;
 
-  @DeleteDateColumn({ type: 'timestamp', nullable: true })
-  @Exclude()
-  deletedAt: Date;
+  @DeleteDateColumn({ nullable: true })
+  deletedAt: Date | null;
 }

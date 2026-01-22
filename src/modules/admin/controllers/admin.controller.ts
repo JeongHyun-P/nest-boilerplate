@@ -1,51 +1,22 @@
-import { Body, Controller, Delete, Get, Param, Post, Put, Req, UploadedFiles, UseInterceptors } from '@nestjs/common';
+import { Controller, Get, Query } from '@nestjs/common';
+import { ApiTags, ApiOperation, ApiBearerAuth } from '@nestjs/swagger';
 import { AdminService } from '../admin.service';
-import { Role } from 'src/common/constants/roles.enum';
-import { Public } from 'src/common/decorators/auth-public.decorator';
-import type { Request } from 'express';
-import { AuthService } from 'src/modules/auth/auth.service';
-import { LoginAdminDto } from '../dto/login-admin.dto';
-import { FileService } from 'src/services/file/file.service';
-import { FileFieldsInterceptor } from '@nestjs/platform-express';
-import { AuthAdmin } from 'src/common/decorators/auth-admin.decorator';
-import { Admin } from '../entities/admin.entity';
-import { CreateAdminDto } from '../dto/create-admin.dto';
+import { UserResponseDto } from '../../user/dto/response.dto';
+import { PaginationDto, PaginatedResponseDto } from '../../../common/dto/pagination.dto';
+import { Roles } from '../../../common/decorators/roles.decorator';
+import { Role } from '../../../common/constants/role.enum';
 
-@Controller('admin')
+// 관리자 컨트롤러
+@ApiTags('Admins')
+@ApiBearerAuth()
+@Roles(Role.ADMIN)
+@Controller('admins')
 export class AdminController {
-  constructor(
-    private readonly adminService: AdminService,
-    private readonly authService: AuthService,
-    private readonly fileService: FileService
-  ) {}
+  constructor(private readonly adminService: AdminService) {}
 
-  // 관리자 로그인
-  @Public()
-  @Post('login')
-  async login(@Body() loginAdminDto: LoginAdminDto) {
-    const { loginId, password } = loginAdminDto;
-    const findAdmin = await this.adminService.getAdminByLoginId(loginId);
-    await this.authService.comparePassword(password, findAdmin.password);
-
-    return await this.authService.generateToken(findAdmin.id, Role.ADMIN);
-  }
-
-  // 토큰 갱신
-  @Public()
-  @Post('token/refresh')
-  async refreshToken(@Req() req: Request) {
-    const refreshToken = this.authService.extractTokenFromHeader(req);
-
-    return await this.authService.rotateToken(refreshToken);
-  }
-
-  // 에디터 파일 업로드
-  @Post('editor/file/upload')
-  @UseInterceptors(FileFieldsInterceptor([{ name: 'editor' }]))
-  async uploadEditorFile(@UploadedFiles() files: Record<string, Express.Multer.File[]>) {
-    const uploadedFiles = await this.fileService.uploadFile(files);
-    const fileKeys = uploadedFiles.map((file) => file?.key);
-
-    return fileKeys;
+  @Get('users')
+  @ApiOperation({ summary: '사용자 목록 조회' })
+  async getUsers(@Query() dto: PaginationDto): Promise<PaginatedResponseDto<UserResponseDto>> {
+    return this.adminService.getUsers(dto.page, dto.limit);
   }
 }

@@ -1,43 +1,53 @@
+import 'source-map-support/register';
 import { NestFactory } from '@nestjs/core';
-import { AppModule } from './app.module';
-import { ValidationPipe } from '@nestjs/common';
+import { ValidationPipe, Logger } from '@nestjs/common';
 import { WinstonModule } from 'nest-winston';
-import { winstonConfig } from './config/winston.config';
-import { LoggingInterceptor } from './common/interceptors/logging.interceptor';
-import { ResponseInterceptor } from './common/interceptors/response.interceptor';
-import { HttpExceptionFilter } from './common/exception-filters/http-exception.filter';
+import helmet from 'helmet';
 import cookieParser from 'cookie-parser';
-import { validationExceptionFactory } from './common/exceptions/validation-exception.factory';
+import { AppModule } from './app.module';
+import { winstonConfig } from './common/config/winston.config';
+import { setupSwagger } from './common/config/swagger.config';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, {
     logger: WinstonModule.createLogger(winstonConfig)
   });
 
-  const isProd = process.env.NODE_ENV === 'production';
+  const logger = new Logger('Bootstrap');
 
-  const allowedOrigins = isProd ? [process.env.SERVICE_URL] : true;
+  // 보안 헤더 설정 (Helmet)
+  app.use(helmet());
 
+  // 쿠키 파서
+  app.use(cookieParser());
+
+  // CORS 설정
   app.enableCors({
-    origin: allowedOrigins,
+    origin: process.env.NODE_ENV === 'production' ? process.env.ALLOWED_ORIGINS?.split(',') || [] : true,
     credentials: true
   });
 
+  // 전역 ValidationPipe 설정
   app.useGlobalPipes(
     new ValidationPipe({
       whitelist: true,
-      forbidNonWhitelisted: false,
+      forbidNonWhitelisted: true,
       transform: true,
-      exceptionFactory: (errors) => validationExceptionFactory(errors)
+      transformOptions: {
+        enableImplicitConversion: true
+      }
     })
   );
 
-  app.use(cookieParser());
-  app.useGlobalInterceptors(new LoggingInterceptor(), new ResponseInterceptor());
-  app.useGlobalFilters(new HttpExceptionFilter());
+  // Swagger 설정
+  setupSwagger(app);
 
+  // 서버 시작
   const port = process.env.PORT || 3000;
   await app.listen(port);
-  console.log(`Server running on port ${port}`);
+
+  logger.log(`Server running on port: http://localhost:${port}`);
+  logger.log(`API Docs: http://localhost:${port}/api-docs`);
 }
+
 bootstrap();

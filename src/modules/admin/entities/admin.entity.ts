@@ -1,25 +1,20 @@
+import { Entity, Column } from 'typeorm';
 import { Exclude } from 'class-transformer';
-import { Column, CreateDateColumn, DeleteDateColumn, Entity, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
+import { BaseEntity } from '../../../common/entities/base.entity';
 
-@Entity({ comment: '관리자' })
-export class Admin {
-  @PrimaryGeneratedColumn()
-  id: number;
-
-  @Column({ type: 'varchar', unique: true, comment: '로그인 아이디' })
+// 관리자 엔티티
+@Entity()
+export class Admin extends BaseEntity {
+  @Column({ type: 'varchar', length: 100, unique: true })
   loginId: string;
 
-  @Column({ type: 'varchar', comment: '비밀번호' })
+  @Column({ type: 'varchar', length: 255 })
   @Exclude()
   password: string;
 
-  @CreateDateColumn({ type: 'timestamp' })
-  createdAt: Date;
+  @Column({ type: 'varchar', length: 100 })
+  name: string;
 
-  @UpdateDateColumn({ type: 'timestamp' })
-  updatedAt: Date;
-
-  @DeleteDateColumn({ type: 'timestamp', nullable: true })
-  @Exclude()
-  deletedAt: Date;
+  @Column({ type: 'boolean', default: true })
+  isActive: boolean;
 }

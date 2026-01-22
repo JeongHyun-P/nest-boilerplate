@@ -1,124 +1,165 @@
-import { Injectable, NestInterceptor, ExecutionContext, CallHandler, Logger } from '@nestjs/common';
+import {
+  Injectable,
+  NestInterceptor,
+  ExecutionContext,
+  CallHandler,
+  Logger,
+} from '@nestjs/common';
 import { Observable } from 'rxjs';
 import { tap } from 'rxjs/operators';
+import { ConfigService } from '@nestjs/config';
+import { v4 as uuidv4 } from 'uuid';
 
-const KST = () => {
-  const now = new Date();
-  const utc = now.getTime() + now.getTimezoneOffset() * 60 * 1000;
-  const koreaTimeDiff = 9 * 60 * 60 * 1000;
-  return new Date(utc + koreaTimeDiff);
-};
+// 민감 필드 목록
+const SENSITIVE_FIELDS = [
+  'password',
+  'token',
+  'refreshtoken',
+  'accesstoken',
+  'secret',
+  'authorization',
+  'cardnumber',
+  'cvv',
+  'ssn',
+];
 
+// 로깅 제외 경로
+const EXCLUDED_PATHS = ['/health', '/ping', '/favicon.ico'];
+
+// 민감 데이터 마스킹
+function maskSensitiveData(obj: unknown): unknown {
+  if (!obj || typeof obj !== 'object') return obj;
+
+  if (Array.isArray(obj)) {
+    return obj.map((item) => maskSensitiveData(item));
+  }
+
+  const masked: Record<string, unknown> = {};
+  for (const [key, value] of Object.entries(obj)) {
+    const lowerKey = key.toLowerCase();
+    if (SENSITIVE_FIELDS.some((field) => lowerKey.includes(field))) {
+      masked[key] = '***';
+    } else if (typeof value === 'object' && value !== null) {
+      masked[key] = maskSensitiveData(value);
+    } else {
+      masked[key] = value;
+    }
+  }
+  return masked;
+}
+
+// 요청/응답 로깅 인터셉터
 @Injectable()
 export class LoggingInterceptor implements NestInterceptor {
-  private logger = new Logger(LoggingInterceptor.name);
+  private readonly logger = new Logger('HTTP');
+  private readonly isDev: boolean;
 
-  intercept(context: ExecutionContext, next: CallHandler): Observable<any> {
+  constructor(private readonly configService: ConfigService) {
+    this.isDev = this.configService.get('nodeEnv') !== 'production';
+  }
+
+  intercept(context: ExecutionContext, next: CallHandler): Observable<unknown> {
     const request = context.switchToHttp().getRequest();
-    const { method, url, ip, headers, body, query } = request;
+    const { method, url, ip, body, headers } = request;
 
-    const isMultipart = typeof request.headers['content-type'] === 'string' && request.headers['content-type'].includes('multipart/form-data');
+    // 로깅 제외 경로 체크
+    const path = url.split('?')[0];
+    if (EXCLUDED_PATHS.includes(path)) {
+      return next.handle();
+    }
 
-    const reqId = Math.floor(Math.random() * 100000)
-      .toString()
-      .padStart(6, '0');
-    const start = Date.now();
+    // Request ID 생성 및 설정
+    const requestId = (headers['x-request-id'] as string) || uuidv4();
+    request.requestId = requestId;
 
-    const now = KST();
-    const datetime = now.toLocaleString('ko-KR', {
-      year: 'numeric',
-      month: '2-digit',
-      day: '2-digit',
-      hour: 'numeric',
-      minute: '2-digit',
-      second: '2-digit',
-      hour12: true
-    });
+    const userId = request.user?.id || 'anonymous';
+    const startTime = Date.now();
 
-    const filteredHeaders = {
-      authorization: headers['authorization'] || '-',
-      'user-agent': headers['user-agent'] || '-',
-      'content-type': headers['content-type'] || '-'
-    };
-
-    request.__logMeta = {
-      reqId,
-      datetime,
-      filteredHeaders,
-      ip,
-      method,
-      url,
-      query,
-      body
-    };
-
-    this.logger.log({
-      level: 'info',
-      message: `
-=============================== Open =============================== [${reqId}]
-Datetime       : ${datetime}
-Headers        : ${JSON.stringify(filteredHeaders)}
-IP             : ${ip}
-Method         : ${method}
-URL            : ${url}
-Query          : ${JSON.stringify(query)}
-Body           : ${isMultipart ? '[Multipart Form Data]' : JSON.stringify(body)}
-`
-    });
+    // multipart/form-data 체크 (파일 업로드)
+    const contentType = headers['content-type'] || '';
+    const isFileUpload = contentType.includes('multipart/form-data');
 
     return next.handle().pipe(
-      tap((responseBody) => {
-        const duration = (Date.now() - start).toFixed(3);
-        const response = context.switchToHttp().getResponse();
-        if (isMultipart) {
-          this.logger.log({
-            level: 'info',
-            message: `
-============================= FormData ============================= [${reqId}]
-Fields         : ${JSON.stringify(request.body)}
-Files          : ${this.formatFileMeta(request.files)}
-`
-          });
-        }
+      tap({
+        next: (responseBody) => {
+          const response = context.switchToHttp().getResponse();
+          const { statusCode } = response;
+          const duration = Date.now() - startTime;
 
-        this.logger.log({
-          level: 'info',
-          message: `
-============================= Response ============================= [${reqId}]
-StatusCode     : ${response.statusCode}
-Response-Time  : ${duration} ms
-Response-Body  : ${JSON.stringify(responseBody)}
-=============================== Close ============================== [${reqId}]
-        `
-        });
-      })
+          // Response 헤더에 Request ID 추가
+          response.setHeader('x-request-id', requestId);
+
+          this.logRequest({
+            requestId,
+            method,
+            url,
+            statusCode,
+            duration,
+            ip,
+            userId,
+            body: isFileUpload ? '[FILE_UPLOAD]' : body,
+            responseBody,
+          });
+        },
+        error: () => {
+          // 에러는 HttpExceptionFilter에서 처리
+        },
+      }),
     );
   }
 
-  private formatFileMeta(files: any) {
-    if (!files) return '-';
+  private logRequest(params: {
+    requestId: string;
+    method: string;
+    url: string;
+    statusCode: number;
+    duration: number;
+    ip: string;
+    userId: string | number;
+    body: unknown;
+    responseBody: unknown;
+  }): void {
+    const {
+      requestId,
+      method,
+      url,
+      statusCode,
+      duration,
+      ip,
+      userId,
+      body,
+      responseBody,
+    } = params;
 
-    if (Array.isArray(files)) {
-      return JSON.stringify(
-        files.map((f) => ({
-          field: f.fieldname,
-          name: f.originalname,
-          size: f.size,
-          type: f.mimetype
-        }))
-      );
+    // 기본 로그 라인
+    const lines: string[] = [
+      `${method} ${url} ${statusCode} - ${duration}ms`,
+      `  └─ ID: ${requestId}`,
+      `  └─ IP: ${ip}`,
+      `  └─ User: ${userId}`,
+    ];
+
+    // Development: 상세 로그
+    if (this.isDev) {
+      // Request Body
+      if (body && typeof body === 'object' && Object.keys(body).length > 0) {
+        const maskedBody = maskSensitiveData(body);
+        lines.push(`  └─ Body: ${JSON.stringify(maskedBody)}`);
+      }
+
+      // Response Body (개발 환경만)
+      if (responseBody !== undefined && responseBody !== null) {
+        const maskedResponse = maskSensitiveData(responseBody);
+        const responseStr = JSON.stringify(maskedResponse);
+        // 너무 긴 응답은 truncate
+        const truncated =
+          responseStr.length > 500
+            ? responseStr.substring(0, 500) + '...[truncated]'
+            : responseStr;
+        lines.push(`  └─ Response: ${truncated}`);
+      }
     }
 
-    return JSON.stringify(
-      Object.entries(files).map(([field, list]: any) => ({
-        field,
-        count: list.length,
-        files: list.map((f: any) => ({
-          name: f.originalname,
-          size: f.size,
-          type: f.mimetype
-        }))
-      }))
-    );
+    this.logger.log(lines.join('\n'));
   }
 }
