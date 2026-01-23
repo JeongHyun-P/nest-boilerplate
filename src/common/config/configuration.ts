@@ -12,6 +12,7 @@ export const validationSchema = Joi.object({
   DB_USERNAME: Joi.string().required(),
   DB_PASSWORD: Joi.string().required(),
   DB_DATABASE: Joi.string().required(),
+  DB_QUERY_LOG: Joi.string().valid('true', 'false').default('false'),
 
   // JWT
   JWT_SECRET: Joi.string().required(),
@@ -51,7 +52,8 @@ export default () => ({
     port: parseInt(process.env.DB_PORT || '3306', 10),
     username: process.env.DB_USERNAME,
     password: process.env.DB_PASSWORD,
-    database: process.env.DB_DATABASE
+    database: process.env.DB_DATABASE,
+    logging: process.env.DB_QUERY_LOG || 'false'
   },
 
   jwt: {

@@ -1,6 +1,7 @@
 import { DataSource, DataSourceOptions } from 'typeorm';
 import { config } from 'dotenv';
 import { CustomNamingStrategy } from './naming.strategy';
+import { isDbLoggingEnabled } from '../common/utils/db-options.util';
 
 config();
 
@@ -15,7 +16,10 @@ export const dataSourceOptions: DataSourceOptions = {
   entities: ['dist/**/*.entity.js'],
   migrations: ['dist/database/migrations/*.js'],
   synchronize: false,
-  logging: process.env.NODE_ENV === 'development',
+  logging: isDbLoggingEnabled(
+    process.env.NODE_ENV || 'development',
+    process.env.DB_LOGGING,
+  ),
   namingStrategy: new CustomNamingStrategy(),
   extra: {
     connectionLimit: 10,

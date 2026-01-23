@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigService } from '@nestjs/config';
 import { CustomNamingStrategy } from './naming.strategy';
+import { isDbLoggingEnabled } from '../common/utils/db-options.util';
 
 // 데이터베이스 모듈
 @Module({
@@ -16,7 +17,10 @@ import { CustomNamingStrategy } from './naming.strategy';
         database: configService.get('database.database'),
         entities: [__dirname + '/../**/*.entity{.ts,.js}'],
         synchronize: configService.get('nodeEnv') === 'development',
-        logging: configService.get('nodeEnv') === 'development',
+        logging: isDbLoggingEnabled(
+          configService.get('nodeEnv') || 'development',
+          configService.get('database.logging'),
+        ),
         namingStrategy: new CustomNamingStrategy(),
         // 타임아웃 설정
         extra: {
