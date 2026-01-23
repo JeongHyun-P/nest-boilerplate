@@ -41,9 +41,12 @@ src/
 │       ├── logging.interceptor.ts
 │       └── transform.interceptor.ts
 ├── database/                  # 데이터베이스 설정
+│   ├── migrations/           # 마이그레이션 파일
+│   ├── seeds/                # 초기 데이터 시딩
+│   │   └── database-seeder.module.ts
 │   ├── database.module.ts
-│   ├── typeorm.config.ts     # TypeORM CLI 설정
-│   └── migrations/           # 마이그레이션 파일
+│   ├── naming.strategy.ts    # 네이밍 전략
+│   └── typeorm.config.ts     # TypeORM CLI 설정
 ├── modules/                   # 기능 모듈
 │   ├── auth/                 # 인증 모듈
 │   │   ├── auth.module.ts
@@ -75,6 +78,9 @@ src/
 │   └── mail/                 # 메일 모듈
 │       ├── mail.module.ts
 │       └── mail.service.ts
+├── scheduler/                 # 스케줄러
+│   ├── scheduler.module.ts
+│   └── mail.scheduler.ts
 ├── app.module.ts
 └── main.ts
 ```
@@ -118,13 +124,14 @@ yarn migration:revert
 ```
 
 ## 응답 포맷
+
 ### 성공 응답
 
 ```json
 {
-  "success": true,
-  "data": { ... },
-  "timestamp": "2024-01-01T00:00:00.000Z"
+  "statusCode": 200,
+  "message": "ok",
+  "data": { ... }
 }
 ```
 
@@ -132,11 +139,8 @@ yarn migration:revert
 
 ```json
 {
-  "success": false,
   "statusCode": 400,
-  "message": "에러 메시지",
-  "error": "Bad Request",
-  "timestamp": "2024-01-01T00:00:00.000Z",
-  "path": "/api/endpoint"
+  "code": "BAD_REQUEST",
+  "message": "에러 메시지"
 }
 ```
