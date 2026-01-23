@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsEmail, IsNotEmpty, IsString, MinLength, MaxLength } from 'class-validator';
+import { IsEmail, IsNotEmpty, IsString, MinLength, MaxLength, IsOptional, Matches } from 'class-validator';
 
 // 회원가입 요청
 export class SignupRequestDto {
@@ -21,6 +21,12 @@ export class SignupRequestDto {
   @MaxLength(100, { message: '이름은 최대 100자 이하' })
   @IsNotEmpty({ message: '이름 필수' })
   name: string;
+
+  @ApiProperty({ description: '전화번호', example: '010-1234-5678', required: false })
+  @IsOptional()
+  @IsString()
+  @Matches(/^01[0-9]-\d{3,4}-\d{4}$/, { message: '올바른 전화번호 형식이 아님 (예: 010-1234-5678)' })
+  phone?: string;
 }
 
 // 유저 로그인 요청

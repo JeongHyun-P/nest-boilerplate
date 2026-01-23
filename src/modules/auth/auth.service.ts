@@ -13,6 +13,7 @@ import { User } from '../user/entities/user.entity';
 import { UserRepository } from '../user/user.repository';
 import { AdminRepository } from '../admin/admin.repository';
 import { MailService } from '../mail/mail.service';
+import { UserStatus } from '../user/constants/user-status.enum';
 
 // 인증 서비스
 @Injectable()
@@ -37,7 +38,7 @@ export class AuthService {
 
   // 회원가입
   async signup(dto: SignupRequestDto, res: Response): Promise<TokenResponseDto> {
-    const { email, password, name } = dto;
+    const { email, password, name, phone } = dto;
 
     const exists = await this.userRepository.existsByEmail(email);
     if (exists) {
@@ -54,7 +55,9 @@ export class AuthService {
       const newUser = userRepo.create({
         email,
         password: hashedPassword,
-        name
+        name,
+        phone: phone || null,
+        status: UserStatus.ACTIVE
       });
       return userRepo.save(newUser);
     });

@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { DataSource, Repository } from 'typeorm';
 import { User } from './entities/user.entity';
+import { UserStatus } from './constants/user-status.enum';
 
 // 유저 Repository
 @Injectable()
@@ -21,7 +22,7 @@ export class UserRepository extends Repository<User> {
     return this.createQueryBuilder('user')
       .addSelect('user.password')
       .where('user.email = :email', { email })
-      .andWhere('user.isActive = :isActive', { isActive: true })
+      .andWhere('user.status = :status', { status: UserStatus.ACTIVE })
       .andWhere('user.deletedAt IS NULL')
       .getOne();
   }
@@ -40,7 +41,7 @@ export class UserRepository extends Repository<User> {
     limit: number,
   ): Promise<[User[], number]> {
     return this.findAndCount({
-      where: { isActive: true },
+      where: { status: UserStatus.ACTIVE },
       order: { createdAt: 'DESC' },
       skip: (page - 1) * limit,
       take: limit,

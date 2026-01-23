@@ -4,6 +4,7 @@ import { UserRepository } from './user.repository';
 import { UserResponseDto } from './dto/response.dto';
 import { PaginatedResponseDto } from '../../common/dto/pagination.dto';
 import { CustomException, ErrorCode } from '../../common/exceptions/custom.exception';
+import { UserStatus } from './constants/user-status.enum';
 
 // 유저 서비스
 @Injectable()
@@ -28,7 +29,7 @@ export class UserService {
   async deactivateUser(userId: number) {
     await this.userRepository.update(
       {
-        isActive: 0
+        status: UserStatus.DELETED
       },
       { id: userId }
     );
