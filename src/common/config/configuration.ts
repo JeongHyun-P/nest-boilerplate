@@ -33,7 +33,11 @@ export const validationSchema = Joi.object({
   MAIL_FROM: Joi.string().optional(),
 
   // External API Timeout
-  EXTERNAL_API_TIMEOUT: Joi.number().default(5000)
+  EXTERNAL_API_TIMEOUT: Joi.number().default(5000),
+
+  // Admin Initial Data
+  ADMIN_INITIAL_LOGIN_ID: Joi.string().default('admin'),
+  ADMIN_INITIAL_PASSWORD: Joi.string().default('password')
 });
 
 // 환경변수 로드 함수
@@ -74,5 +78,10 @@ export default () => ({
 
   externalApi: {
     timeout: parseInt(process.env.EXTERNAL_API_TIMEOUT || '5000', 10)
+  },
+
+  admin: {
+    initialLoginId: process.env.ADMIN_INITIAL_LOGIN_ID || 'admin',
+    initialPassword: process.env.ADMIN_INITIAL_PASSWORD || 'password'
   }
 });

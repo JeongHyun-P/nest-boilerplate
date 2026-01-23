@@ -1,7 +1,8 @@
 import { Injectable, HttpStatus } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
 import * as bcrypt from 'bcrypt';
 import { User } from './entities/user.entity';
-import { UserRepository } from './user.repository';
 import { UserResponseDto } from './dto/response.dto';
 import { UpdateProfileRequestDto, ChangePasswordRequestDto } from './dto/request.dto';
 import { PaginatedResponseDto } from '../../common/dto/pagination.dto';
@@ -11,7 +12,10 @@ import { UserStatus } from './constants/user-status.enum';
 // 유저 서비스
 @Injectable()
 export class UserService {
-  constructor(private readonly userRepository: UserRepository) {}
+  constructor(
+    @InjectRepository(User)
+    private readonly userRepository: Repository<User>,
+  ) {}
 
   // 프로필 조회
   async getProfile(userId: number): Promise<UserResponseDto> {
@@ -64,7 +68,13 @@ export class UserService {
 
   // 유저 목록 조회 (관리자용)
   async getUsers(page: number, limit: number): Promise<PaginatedResponseDto<UserResponseDto>> {
-    const [users, total] = await this.userRepository.findWithPagination(page, limit);
+    const [users, total] = await this.userRepository.findAndCount({
+      where: { status: UserStatus.ACTIVE },
+      order: { createdAt: 'DESC' },
+      skip: (page - 1) * limit,
+      take: limit,
+    });
+    
     const items = users.map((user) => new UserResponseDto(user));
     return new PaginatedResponseDto(items, total, page, limit);
   }

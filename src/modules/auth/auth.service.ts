@@ -1,7 +1,8 @@
 import { Injectable, HttpStatus } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository, DataSource } from 'typeorm';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
-import { DataSource } from 'typeorm';
 import { Response } from 'express';
 import * as bcrypt from 'bcrypt';
 import { Role } from '../../common/constants/role.enum';
@@ -10,10 +11,10 @@ import { TokenResponseDto, RefreshTokenResponseDto } from './dto/response.dto';
 import { SignupRequestDto, LoginRequestDto, AdminLoginRequestDto } from './dto/request.dto';
 import { JwtPayload } from './strategies/jwt.strategy';
 import { User } from '../user/entities/user.entity';
-import { UserRepository } from '../user/user.repository';
-import { AdminRepository } from '../admin/admin.repository';
+import { Admin } from '../admin/entities/admin.entity';
 import { MailService } from '../mail/mail.service';
 import { UserStatus } from '../user/constants/user-status.enum';
+import { AdminStatus } from '../admin/constants/admin-status.enum';
 
 // 인증 서비스
 @Injectable()
@@ -26,8 +27,10 @@ export class AuthService {
     private readonly jwtService: JwtService,
     private readonly configService: ConfigService,
     private readonly dataSource: DataSource,
-    private readonly userRepository: UserRepository,
-    private readonly adminRepository: AdminRepository,
+    @InjectRepository(User)
+    private readonly userRepository: Repository<User>,
+    @InjectRepository(Admin)
+    private readonly adminRepository: Repository<Admin>,
     private readonly mailService: MailService
   ) {
     const serviceName = this.configService.get<string>('serviceName') || 'nest-app';
@@ -40,7 +43,7 @@ export class AuthService {
   async signup(dto: SignupRequestDto, res: Response): Promise<TokenResponseDto> {
     const { email, password, name, phone } = dto;
 
-    const exists = await this.userRepository.existsByEmail(email);
+    const exists = await this.userRepository.exists({ where: { email } });
     if (exists) {
       throw new CustomException(ErrorCode.USER_ALREADY_EXISTS);
     }
@@ -68,7 +71,8 @@ export class AuthService {
   async login(dto: LoginRequestDto, res: Response): Promise<TokenResponseDto> {
     const { email, password } = dto;
 
-    const user = await this.userRepository.findActiveByEmailWithPassword(email);
+    const user = await this.findActiveUserByEmailWithPassword(email);
+
     if (!user) {
       throw new CustomException(ErrorCode.LOGIN_FAILED);
     }
@@ -82,7 +86,7 @@ export class AuthService {
   async adminLogin(dto: AdminLoginRequestDto, res: Response): Promise<TokenResponseDto> {
     const { loginId, password } = dto;
 
-    const admin = await this.adminRepository.findByLoginIdWithPassword(loginId);
+    const admin = await this.findActiveAdminByLoginIdWithPassword(loginId);
     if (!admin) {
       throw new CustomException(ErrorCode.ADMIN_NOT_FOUND);
     }
@@ -136,6 +140,24 @@ export class AuthService {
   // Refresh Token 쿠키 이름 반환
   getRefreshTokenCookieName(): string {
     return this.refreshTokenCookie;
+  }
+
+  // 활성 유저 조회 (비밀번호 포함)
+  private async findActiveUserByEmailWithPassword(email: string): Promise<User | null> {
+    return this.userRepository.createQueryBuilder('user')
+      .addSelect('user.password')
+      .where('user.email = :email', { email })
+      .andWhere('user.status = :status', { status: UserStatus.ACTIVE })
+      .getOne();
+  }
+
+  // 활성 관리자 조회 (비밀번호 포함)
+  private async findActiveAdminByLoginIdWithPassword(loginId: string): Promise<Admin | null> {
+    return this.adminRepository.createQueryBuilder('admin')
+      .addSelect('admin.password')
+      .where('admin.loginId = :loginId', { loginId })
+      .andWhere('admin.status = :status', { status: AdminStatus.ACTIVE })
+      .getOne();
   }
 
   // Access Token 생성

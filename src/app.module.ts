@@ -6,6 +6,7 @@ import { WinstonModule } from 'nest-winston';
 import configuration, { validationSchema } from './common/config/configuration';
 import { winstonConfig } from './common/config/winston.config';
 import { DatabaseModule } from './database/database.module';
+import { DatabaseSeederModule } from './database/seeds/database-seeder.module';
 import { SchedulerModule } from './scheduler/scheduler.module';
 import { AuthModule } from './modules/auth/auth.module';
 import { UserModule } from './modules/user/user.module';
@@ -38,6 +39,7 @@ import { LoggingInterceptor } from './common/interceptors/logging.interceptor';
 
     // 데이터베이스
     DatabaseModule,
+    DatabaseSeederModule,
 
     // 스케줄러 (모든 스케줄러를 한 곳에서 관리)
     SchedulerModule,
