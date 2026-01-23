@@ -33,10 +33,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
   // 토큰 검증 후 유저 정보 반환
   async validate(payload: JwtPayload) {
     if (!payload.sub || !payload.role) {
-      throw new CustomException({
-        statusCode: HttpStatus.UNAUTHORIZED,
-        ...ErrorCode.INVALID_TOKEN,
-      });
+      throw new CustomException(ErrorCode.INVALID_TOKEN);
     }
 
     return {

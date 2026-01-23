@@ -28,17 +28,17 @@ export class JwtAuthGuard extends AuthGuard('jwt') {
   handleRequest<TUser = any>(err: Error | null, user: TUser | false, info: Error | null): TUser {
     // 토큰 만료
     if (info?.name === 'TokenExpiredError') {
-      throw new CustomException({ statusCode: HttpStatus.UNAUTHORIZED, ...ErrorCode.TOKEN_EXPIRED });
+      throw new CustomException(ErrorCode.TOKEN_EXPIRED);
     }
 
     // 유효하지 않은 토큰 (잘못된 형식, 시그니처 불일치 등)
     if (info?.name === 'JsonWebTokenError') {
-      throw new CustomException({ statusCode: HttpStatus.UNAUTHORIZED, ...ErrorCode.INVALID_TOKEN });
+      throw new CustomException(ErrorCode.INVALID_TOKEN);
     }
 
     // 그 외 에러 또는 user 없음
     if (err || !user) {
-      throw new CustomException({ statusCode: HttpStatus.UNAUTHORIZED, ...ErrorCode.UNAUTHORIZED });
+      throw new CustomException(ErrorCode.UNAUTHORIZED);
     }
 
     return user;

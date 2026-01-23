@@ -42,10 +42,7 @@ export class AuthService {
 
     const exists = await this.userRepository.existsByEmail(email);
     if (exists) {
-      throw new CustomException({
-        statusCode: HttpStatus.CONFLICT,
-        ...ErrorCode.USER_ALREADY_EXISTS
-      });
+      throw new CustomException(ErrorCode.USER_ALREADY_EXISTS);
     }
 
     const hashedPassword = await this.hashPassword(password);
@@ -73,10 +70,7 @@ export class AuthService {
 
     const user = await this.userRepository.findActiveByEmailWithPassword(email);
     if (!user) {
-      throw new CustomException({
-        statusCode: HttpStatus.UNAUTHORIZED,
-        ...ErrorCode.USER_NOT_FOUND
-      });
+      throw new CustomException(ErrorCode.LOGIN_FAILED);
     }
 
     await this.validatePassword(password, user.password);
@@ -90,10 +84,7 @@ export class AuthService {
 
     const admin = await this.adminRepository.findByLoginIdWithPassword(loginId);
     if (!admin) {
-      throw new CustomException({
-        statusCode: HttpStatus.UNAUTHORIZED,
-        ...ErrorCode.USER_NOT_FOUND
-      });
+      throw new CustomException(ErrorCode.ADMIN_NOT_FOUND);
     }
 
     await this.validatePassword(password, admin.password);
@@ -104,10 +95,7 @@ export class AuthService {
   // 토큰 갱신 (쿠키에서 Refresh Token 읽기)
   refreshTokens(refreshToken: string, res: Response): RefreshTokenResponseDto {
     if (!refreshToken) {
-      throw new CustomException({
-        statusCode: HttpStatus.UNAUTHORIZED,
-        ...ErrorCode.INVALID_TOKEN
-      });
+      throw new CustomException(ErrorCode.INVALID_TOKEN);
     }
 
     try {
@@ -136,10 +124,7 @@ export class AuthService {
       };
     } catch {
       this.clearRefreshTokenCookie(res);
-      throw new CustomException({
-        statusCode: HttpStatus.UNAUTHORIZED,
-        ...ErrorCode.INVALID_TOKEN
-      });
+      throw new CustomException(ErrorCode.INVALID_TOKEN);
     }
   }
 
@@ -236,10 +221,7 @@ export class AuthService {
   async validatePassword(password: string, hashedPassword: string): Promise<void> {
     const isValid = await this.comparePassword(password, hashedPassword);
     if (!isValid) {
-      throw new CustomException({
-        statusCode: HttpStatus.UNAUTHORIZED,
-        ...ErrorCode.USER_NOT_FOUND
-      });
+      throw new CustomException(ErrorCode.LOGIN_FAILED);
     }
   }
 }

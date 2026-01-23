@@ -12,7 +12,7 @@ export class FileService {
   // 파일 업로드 (단일/다중 통합) - fieldname 기반 폴더 매핑
   async uploadFiles(files: Express.Multer.File[]): Promise<FileUploadResponseDto[]> {
     if (!files || files.length === 0) {
-      throw new CustomException({ statusCode: HttpStatus.BAD_REQUEST, ...ErrorCode.FILE_NOT_FOUND });
+      throw new CustomException(ErrorCode.FILE_NOT_FOUND);
     }
 
     // 각 파일의 fieldname이 유효한 키인지 검증
@@ -52,7 +52,6 @@ export class FileService {
     const validKeys = Object.values(FileUploadKey) as string[];
     if (!validKeys.includes(fieldname)) {
       throw new CustomException({
-        statusCode: HttpStatus.BAD_REQUEST,
         ...ErrorCode.INVALID_FILE_KEY,
         message: `유효하지 않은 파일 키: ${fieldname}`
       });
@@ -67,11 +66,11 @@ export class FileService {
   // 파일 유효성 검사
   private validateFile(file: Express.Multer.File): void {
     if (!file) {
-      throw new CustomException({ statusCode: HttpStatus.BAD_REQUEST, ...ErrorCode.FILE_NOT_FOUND });
+      throw new CustomException(ErrorCode.FILE_NOT_FOUND);
     }
 
     if (file.size > MAX_FILE_SIZE) {
-      throw new CustomException({ statusCode: HttpStatus.BAD_REQUEST, ...ErrorCode.FILE_TOO_LARGE });
+      throw new CustomException(ErrorCode.FILE_TOO_LARGE);
     }
   }
 
@@ -80,7 +79,7 @@ export class FileService {
     this.validateFile(file);
 
     if (!ALLOWED_IMAGE_TYPES.includes(file.mimetype)) {
-      throw new CustomException({ statusCode: HttpStatus.BAD_REQUEST, ...ErrorCode.INVALID_FILE_TYPE });
+      throw new CustomException(ErrorCode.INVALID_FILE_TYPE);
     }
   }
 }

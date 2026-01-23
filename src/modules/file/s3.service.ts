@@ -46,10 +46,7 @@ export class S3Service {
   // 파일 업로드
   async upload(file: Express.Multer.File, folder: string): Promise<FileUploadResponseDto> {
     if (!this.s3Client) {
-      throw new CustomException({
-        statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
-        ...ErrorCode.FILE_UPLOAD_FAILED
-      });
+      throw new CustomException(ErrorCode.FILE_UPLOAD_FAILED);
     }
 
     try {
@@ -76,16 +73,10 @@ export class S3Service {
 
       // 타임아웃 에러 감지
       if (this.isTimeoutError(error)) {
-        throw new CustomException({
-          statusCode: HttpStatus.SERVICE_UNAVAILABLE,
-          ...ErrorCode.EXTERNAL_S3_TIMEOUT
-        });
+        throw new CustomException(ErrorCode.EXTERNAL_S3_TIMEOUT);
       }
 
-      throw new CustomException({
-        statusCode: HttpStatus.SERVICE_UNAVAILABLE,
-        ...ErrorCode.EXTERNAL_S3_UPLOAD_FAILED
-      });
+      throw new CustomException(ErrorCode.EXTERNAL_S3_UPLOAD_FAILED);
     }
   }
 
@@ -105,16 +96,10 @@ export class S3Service {
 
       // 타임아웃 에러 감지
       if (this.isTimeoutError(error)) {
-        throw new CustomException({
-          statusCode: HttpStatus.SERVICE_UNAVAILABLE,
-          ...ErrorCode.EXTERNAL_S3_TIMEOUT
-        });
+        throw new CustomException(ErrorCode.EXTERNAL_S3_TIMEOUT);
       }
 
-      throw new CustomException({
-        statusCode: HttpStatus.SERVICE_UNAVAILABLE,
-        ...ErrorCode.EXTERNAL_S3_DELETE_FAILED
-      });
+      throw new CustomException(ErrorCode.EXTERNAL_S3_DELETE_FAILED);
     }
   }
 
