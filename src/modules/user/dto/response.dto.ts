@@ -1,9 +1,9 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { User } from '../entities/user.entity';
 
-// 사용자 응답
+// 유저 응답
 export class UserResponseDto {
-  @ApiProperty({ description: '사용자 ID', example: 1 })
+  @ApiProperty({ description: '유저 ID', example: 1 })
   id: number;
 
   @ApiProperty({ description: '이메일', example: 'user@example.com' })

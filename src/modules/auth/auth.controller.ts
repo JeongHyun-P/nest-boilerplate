@@ -15,15 +15,15 @@ export class AuthController {
 
   @Public()
   @Post('user/signup')
-  @ApiOperation({ summary: '회원가입' })
-  @ApiSuccessResponse(TokenResponseDto, 201)
+  @ApiOperation({ summary: '유저 회원가입' })
+  @ApiSuccessResponse(TokenResponseDto)
   async signup(@Body() dto: SignupRequestDto, @Res({ passthrough: true }) res: Response): Promise<TokenResponseDto> {
     return this.authService.signup(dto, res);
   }
 
   @Public()
   @Post('user/login')
-  @ApiOperation({ summary: '사용자 로그인' })
+  @ApiOperation({ summary: '유저 로그인' })
   @ApiSuccessResponse(TokenResponseDto)
   async login(@Body() dto: LoginRequestDto, @Res({ passthrough: true }) res: Response): Promise<TokenResponseDto> {
     return this.authService.login(dto, res);

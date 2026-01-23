@@ -30,7 +30,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     });
   }
 
-  // 토큰 검증 후 사용자 정보 반환
+  // 토큰 검증 후 유저 정보 반환
   async validate(payload: JwtPayload) {
     if (!payload.sub || !payload.role) {
       throw new CustomException({

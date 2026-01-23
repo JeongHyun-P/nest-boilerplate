@@ -34,10 +34,10 @@ export const ErrorCode = {
     message: '접근 권한이 없습니다.'
   },
 
-  // 사용자 관련
+  // 유저 관련
   USER_NOT_FOUND: {
     code: 'USER_NOT_FOUND',
-    message: '사용자를 찾을 수 없습니다.'
+    message: '유저를 찾을 수 없습니다.'
   },
   USER_ALREADY_EXISTS: {
     code: 'USER_ALREADY_EXISTS',

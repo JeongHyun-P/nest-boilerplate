@@ -64,7 +64,7 @@ export class AuthService {
     return this.generateTokensWithCookie(user.id, user.email, Role.USER, res);
   }
 
-  // 사용자 로그인
+  // 유저 로그인
   async login(dto: LoginRequestDto, res: Response): Promise<TokenResponseDto> {
     const { email, password } = dto;
 

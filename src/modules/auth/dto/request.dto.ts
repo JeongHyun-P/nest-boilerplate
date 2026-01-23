@@ -23,7 +23,7 @@ export class SignupRequestDto {
   name: string;
 }
 
-// 사용자 로그인 요청
+// 유저 로그인 요청
 export class LoginRequestDto {
   @ApiProperty({ description: '이메일', example: 'user@example.com' })
   @IsEmail({}, { message: '올바른 이메일 형식이 아님' })

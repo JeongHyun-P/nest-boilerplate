@@ -6,7 +6,7 @@ import { UserRepository } from './user.repository';
 import { User } from './entities/user.entity';
 import { FileModule } from '../file/file.module';
 
-// 사용자 모듈
+// 유저 모듈
 @Module({
   imports: [TypeOrmModule.forFeature([User]), FileModule],
   controllers: [UserController],

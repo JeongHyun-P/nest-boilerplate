@@ -8,7 +8,7 @@ import { PaginatedResponseDto } from '../../common/dto/pagination.dto';
 export class AdminService {
   constructor(private readonly userService: UserService) {}
 
-  // 사용자 목록 조회
+  // 유저 목록 조회
   async getUsers(page: number, limit: number): Promise<PaginatedResponseDto<UserResponseDto>> {
     return this.userService.getUsers(page, limit);
   }

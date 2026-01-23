@@ -5,7 +5,7 @@ import { UserResponseDto } from './dto/response.dto';
 import { PaginatedResponseDto } from '../../common/dto/pagination.dto';
 import { CustomException, ErrorCode } from '../../common/exceptions/custom.exception';
 
-// 사용자 서비스
+// 유저 서비스
 @Injectable()
 export class UserService {
   constructor(private readonly userRepository: UserRepository) {}
@@ -24,14 +24,24 @@ export class UserService {
     return new UserResponseDto(user);
   }
 
-  // 사용자 목록 조회 (관리자용)
+  // 회원 탈퇴
+  async deactivateUser(userId: number) {
+    await this.userRepository.update(
+      {
+        isActive: 0
+      },
+      { id: userId }
+    );
+  }
+
+  // 유저 목록 조회 (관리자용)
   async getUsers(page: number, limit: number): Promise<PaginatedResponseDto<UserResponseDto>> {
     const [users, total] = await this.userRepository.findWithPagination(page, limit);
     const items = users.map((user) => new UserResponseDto(user));
     return new PaginatedResponseDto(items, total, page, limit);
   }
 
-  // ID로 사용자 조회
+  // ID로 유저 조회
   async findById(userId: number): Promise<User | null> {
     return this.userRepository.findOne({ where: { id: userId } });
   }

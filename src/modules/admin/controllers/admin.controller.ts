@@ -16,7 +16,7 @@ export class AdminController {
   constructor(private readonly adminService: AdminService) {}
 
   @Get('users')
-  @ApiOperation({ summary: '사용자 목록 조회' })
+  @ApiOperation({ summary: '유저 목록 조회' })
   @ApiPaginatedResponse(UserResponseDto)
   @ApiCommonErrorResponses()
   async getUsers(@Query() dto: PaginationDto): Promise<PaginatedResponseDto<UserResponseDto>> {

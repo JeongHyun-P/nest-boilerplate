@@ -5,7 +5,7 @@ import { Repository, In, LessThan } from 'typeorm';
 import * as nodemailer from 'nodemailer';
 import { Transporter } from 'nodemailer';
 import { MailHistory } from './entities/mail-history.entity';
-import { MailStatus } from './enums/mail-status.enum';
+import { MailStatus } from './constants/mail-status.enum';
 
 // 메일 서비스
 @Injectable()

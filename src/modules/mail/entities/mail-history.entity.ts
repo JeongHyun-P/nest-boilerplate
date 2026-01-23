@@ -1,6 +1,6 @@
 import { Entity, Column } from 'typeorm';
 import { BaseEntity } from '../../../common/entities/base.entity';
-import { MailStatus } from '../enums/mail-status.enum';
+import { MailStatus } from '../constants/mail-status.enum';
 
 // 메일 발송 내역 엔티티
 @Entity('mail_history', { comment: '메일 발송 내역' })
