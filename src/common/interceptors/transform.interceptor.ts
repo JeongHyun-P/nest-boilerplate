@@ -26,11 +26,15 @@ export class TransformInterceptor<T>
     const response = context.switchToHttp().getResponse();
 
     return next.handle().pipe(
-      map((data) => ({
-        statusCode: response.statusCode,
-        message: 'ok',
-        data: data ?? null,
-      })),
+      map((data) => {
+        // 모든 정상 응답의 HTTP status를 200으로 통일
+        response.status(200);
+        return {
+          statusCode: 200,
+          message: 'ok',
+          data: data ?? null,
+        };
+      }),
     );
   }
 }

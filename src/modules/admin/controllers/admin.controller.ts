@@ -5,7 +5,7 @@ import { UserResponseDto } from '../../user/dto/response.dto';
 import { PaginationDto, PaginatedResponseDto } from '../../../common/dto/pagination.dto';
 import { Roles } from '../../../common/decorators/roles.decorator';
 import { Role } from '../../../common/constants/role.enum';
-import { ApiPaginatedResponse, ApiCommonErrorResponses } from '../../../common/decorators/api-response.decorator';
+import { ApiOkPaginatedResponseDto } from '../../../common/decorators/api-response.decorator';
 
 // 관리자 컨트롤러
 @ApiTags('Admins')
@@ -16,9 +16,11 @@ export class AdminController {
   constructor(private readonly adminService: AdminService) {}
 
   @Get('users')
-  @ApiOperation({ summary: '유저 목록 조회' })
-  @ApiPaginatedResponse(UserResponseDto)
-  @ApiCommonErrorResponses()
+  @ApiOperation({
+    summary: '유저 목록 조회',
+    description: '전체 유저 목록을 페이지네이션하여 조회. 관리자 권한 필요.',
+  })
+  @ApiOkPaginatedResponseDto(UserResponseDto)
   async getUsers(@Query() dto: PaginationDto): Promise<PaginatedResponseDto<UserResponseDto>> {
     return this.adminService.getUsers(dto.page, dto.limit);
   }
