@@ -58,6 +58,20 @@ export const ApiOkPaginatedResponseDto = <TModel extends Type<any>>(model: TMode
 };
 
 /**
+ * Swagger용 공통 성공 응답 데코레이터 (데이터 없음)
+ * 응답 본문에 data가 없는 경우 사용 (예: 로그아웃)
+ * 실제 응답은 { statusCode: 200, message: "ok", data: null } 형태
+ */
+export const ApiOkEmptyResponseDto = () => {
+  return applyDecorators(
+    ApiResponse({
+      status: 200,
+      description: '성공',
+    })
+  );
+};
+
+/**
  * Swagger용 공통 성공 응답 데코레이터 (인라인 스키마)
  * 간단한 응답 객체를 직접 정의할 때 사용
  */

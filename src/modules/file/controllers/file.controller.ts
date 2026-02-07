@@ -2,10 +2,10 @@ import { Controller, Post, Delete, UseInterceptors, UploadedFiles, Query } from 
 import { AnyFilesInterceptor } from '@nestjs/platform-express';
 import { ApiTags, ApiOperation, ApiBearerAuth, ApiConsumes, ApiBody, ApiQuery } from '@nestjs/swagger';
 import { FileService } from '../file.service';
-import { FileUploadResponseDto, FileDeleteResponseDto } from '../dto/response.dto';
+import { FileUploadResponseDto } from '../dto/response.dto';
 import { Roles } from '../../../common/decorators/roles.decorator';
 import { Role } from '../../../common/constants/role.enum';
-import { ApiOkArrayResponseDto, ApiOkResponseDto } from '../../../common/decorators/api-response.decorator';
+import { ApiOkArrayResponseDto, ApiOkEmptyResponseDto } from '../../../common/decorators/api-response.decorator';
 
 // 파일 업로드 컨트롤러
 @ApiTags('Files')
@@ -36,12 +36,11 @@ export class FileController {
   @Roles(Role.ADMIN)
   @ApiOperation({
     summary: '파일 삭제 (관리자 전용)',
-    description: 'S3에 업로드된 파일을 삭제. 관리자 권한 필요.',
+    description: 'S3에 업로드된 파일을 삭제.',
   })
   @ApiQuery({ name: 'key', required: true, description: '삭제할 파일 키 (S3 경로)' })
-  @ApiOkResponseDto(FileDeleteResponseDto)
-  async deleteFile(@Query('key') key: string): Promise<FileDeleteResponseDto> {
-    await this.fileService.deleteFile(key);
-    return { success: true };
+  @ApiOkEmptyResponseDto()
+  async deleteFile(@Query('key') key: string): Promise<void> {
+    return await this.fileService.deleteFile(key);
   }
 }

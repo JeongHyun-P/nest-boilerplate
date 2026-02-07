@@ -18,7 +18,7 @@ export class AdminUserController {
   @Get('users')
   @ApiOperation({
     summary: '유저 목록 조회',
-    description: '전체 유저 목록을 페이지네이션하여 조회. 관리자 권한 필요.',
+    description: '전체 유저 목록을 페이지네이션하여 조회',
   })
   @ApiOkPaginatedResponseDto(UserResponseDto)
   async getUsers(@Query() dto: PaginationDto): Promise<PaginatedResponseDto<UserResponseDto>> {
@@ -28,7 +28,7 @@ export class AdminUserController {
   @Get(':userId')
   @ApiOperation({
     summary: '유저 상세 조회',
-    description: '특정 유저의 상세 정보를 조회합니다. (관리자 전용)',
+    description: '특정 유저의 상세 정보를 조회',
   })
   @ApiOkResponseDto(UserResponseDto)
   async getUserDetail(@Param('userId', ParseIntPipe) userId: number): Promise<UserResponseDto> {

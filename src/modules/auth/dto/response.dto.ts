@@ -11,9 +11,3 @@ export class RefreshTokenResponseDto {
   @ApiProperty({ description: '새로운 Access Token', example: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...' })
   accessToken: string;
 }
-
-// 로그아웃 응답
-export class LogoutResponseDto {
-  @ApiProperty({ description: '로그아웃 성공 여부', example: true })
-  success: boolean;
-}

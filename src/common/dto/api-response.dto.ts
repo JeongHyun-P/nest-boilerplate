@@ -23,9 +23,3 @@ export class ApiErrorResponseDto {
   @ApiProperty({ description: '에러 메시지', example: '잘못된 입력값입니다.' })
   message: string;
 }
-
-// 파일 삭제 성공 응답
-export class DeleteSuccessResponseDto {
-  @ApiProperty({ description: '삭제 성공 여부', example: true })
-  success: boolean;
-}

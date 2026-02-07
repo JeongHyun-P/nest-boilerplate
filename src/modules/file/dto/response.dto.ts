@@ -14,9 +14,3 @@ export class FileUploadResponseDto {
   @ApiProperty({ description: '파일 MIME 타입', example: 'image/png' })
   contentType: string;
 }
-
-// 파일 삭제 응답
-export class FileDeleteResponseDto {
-  @ApiProperty({ description: '삭제 성공 여부', example: true })
-  success: boolean;
-}
