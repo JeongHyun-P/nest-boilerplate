@@ -1,6 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { UserService } from '../user/user.service';
-import { UserResponseDto } from '../user/dto/response.dto';
+import { UserResponseDto } from '../user/dto/user.response.dto';
 import { PaginatedResponseDto } from '../../common/dto/pagination.dto';
 import { CustomException, ErrorCode } from '../../common/exceptions/custom.exception';
 // 관리자 서비스

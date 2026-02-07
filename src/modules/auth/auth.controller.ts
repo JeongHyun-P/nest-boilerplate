@@ -2,8 +2,8 @@ import { Controller, Post, Body, Res, Req } from '@nestjs/common';
 import { ApiTags, ApiOperation } from '@nestjs/swagger';
 import type { Response, Request } from 'express';
 import { AuthService } from './auth.service';
-import { SignupRequestDto, LoginRequestDto, AdminLoginRequestDto } from './dto/request.dto';
-import { TokenResponseDto, RefreshTokenResponseDto } from './dto/response.dto';
+import { SignupRequestDto, LoginRequestDto, AdminLoginRequestDto } from './dto/auth.request.dto';
+import { TokenResponseDto, RefreshTokenResponseDto } from './dto/auth.response.dto';
 import { Public } from '../../common/decorators/public.decorator';
 import { ApiOkEmptyResponseDto, ApiOkResponseDto } from '../../common/decorators/api-response.decorator';
 

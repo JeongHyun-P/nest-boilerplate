@@ -5,7 +5,7 @@ import { NodeHttpHandler } from '@smithy/node-http-handler';
 import { v4 as uuidv4 } from 'uuid';
 import * as path from 'path';
 import * as https from 'https';
-import { FileUploadResponseDto } from './dto/response.dto';
+import { FileUploadResponseDto } from './dto/file.response.dto';
 import { CustomException, ErrorCode } from '../../common/exceptions/custom.exception';
 
 // S3 서비스

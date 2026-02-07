@@ -1,6 +1,6 @@
 import { Injectable, HttpStatus } from '@nestjs/common';
 import { S3Service } from './s3.service';
-import { FileUploadResponseDto } from './dto/response.dto';
+import { FileUploadResponseDto } from './dto/file.response.dto';
 import { CustomException, ErrorCode } from '../../common/exceptions/custom.exception';
 import { ALLOWED_IMAGE_TYPES, MAX_FILE_SIZE, FileUploadKey, FILE_FOLDER_MAP, DEFAULT_UPLOAD_FOLDER } from './constants/file.constants';
 

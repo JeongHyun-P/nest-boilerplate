@@ -1,7 +1,7 @@
 import { Controller, Get, Param, ParseIntPipe, Query } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiBearerAuth } from '@nestjs/swagger';
 import { AdminService } from '../admin.service';
-import { UserResponseDto } from '../../user/dto/response.dto';
+import { UserResponseDto } from '../../user/dto/user.response.dto';
 import { Roles } from '../../../common/decorators/roles.decorator';
 import { Role } from '../../../common/constants/role.enum';
 import { ApiOkPaginatedResponseDto, ApiOkResponseDto } from '../../../common/decorators/api-response.decorator';

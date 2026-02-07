@@ -2,7 +2,7 @@ import { Controller, Post, Delete, UseInterceptors, UploadedFiles, Query } from 
 import { AnyFilesInterceptor } from '@nestjs/platform-express';
 import { ApiTags, ApiOperation, ApiBearerAuth, ApiConsumes, ApiBody, ApiQuery } from '@nestjs/swagger';
 import { FileService } from '../file.service';
-import { FileUploadResponseDto } from '../dto/response.dto';
+import { FileUploadResponseDto } from '../dto/file.response.dto';
 import { Roles } from '../../../common/decorators/roles.decorator';
 import { Role } from '../../../common/constants/role.enum';
 import { ApiOkArrayResponseDto, ApiOkEmptyResponseDto } from '../../../common/decorators/api-response.decorator';

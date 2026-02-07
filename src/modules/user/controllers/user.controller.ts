@@ -1,8 +1,8 @@
 import { Controller, Delete, Get, Patch, Body } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiBearerAuth } from '@nestjs/swagger';
 import { UserService } from '../user.service';
-import { UserResponseDto } from '../dto/response.dto';
-import { UpdateProfileRequestDto, ChangePasswordRequestDto } from '../dto/request.dto';
+import { UserResponseDto } from '../dto/user.response.dto';
+import { UpdateProfileRequestDto, ChangePasswordRequestDto } from '../dto/user.request.dto';
 import { CurrentUser } from '../../../common/decorators/current-user.decorator';
 import { Roles } from 'src/common/decorators/roles.decorator';
 import { Role } from 'src/common/constants/role.enum';
