@@ -13,7 +13,40 @@ NestJS Boilerplate (Layered Architecture–based Modular Monolith)
 - **Documentation**: Swagger
 - **Logging**: Winston
 
-## 프로젝트 구조
+## 아키텍처 및 설계 원칙
+
+### 컨트롤러 분리 원칙
+
+컨트롤러는 **역할(Role) 단위**로 분리하고, 각 컨트롤러 클래스 레벨에 `@Roles()` 가드를 적용한다.
+
+- 관리자 API → `src/modules/admin/controllers/admin-*.controller.ts`
+- 사용자 API → `src/modules/user/controllers/user-*.controller.ts`
+- 도메인 모듈에는 컨트롤러를 두지 않고 Service/Entity/DTO만 관리
+- 클래스 레벨 가드: `@Roles(Role.ADMIN)` 또는 `@Roles(Role.USER)`를 컨트롤러 클래스에 적용. 메서드 단위 가드는 최소화
+- @Public 사용 제한: `@Public()`은 Auth 컨트롤러에 및 일부 경우에 사용. 그 외 모든 API는 USER 또는 ADMIN 역할 필요
+- 컨트롤러 완전 분리: 관리자와 사용자가 같은 데이터를 조회하더라도 컨트롤러는 반드시 분리 (확장성 고려)
+- 서비스 메서드 분리: 공유 조회 로직은 `xxxByAdmin()`, `xxxByUser()` + `private xxxCommon()`으로 분리
+
+### Route Prefix Convention
+
+컨트롤러의 route prefix는 역할 기반 경로 아래에 중첩
+
+- Admin 컨트롤러: `@Controller('admins/<resource>')` — e.g., `admins/clubs`, `admins/faqs`, `admins/users`
+- User 컨트롤러: `@Controller('users/<resource>')` — e.g., `users/clubs`, `users/faqs`, `users/notices`
+- 공용 컨트롤러: `auth`, `files`, `health` — 최상위 경로 (역할 prefix 없음)
+
+### DTO 구성 원칙
+
+- 기능별 파일 분리가 아닌 도메인 단위 파일 구성
+
+```
+dto/
+├── user.request.dto.ts
+└── user.response.dto.ts
+```
+
+- Request / Response DTO 분리
+- Response DTO는 외부 API 스펙 계약이므로 Entity 및 내부 비즈니스 로직 변경시 DTO는 협의 후 수정
 
 ```
 src/

@@ -58,6 +58,28 @@ export const ApiOkPaginatedResponseDto = <TModel extends Type<any>>(model: TMode
 };
 
 /**
+ * Swagger용 공통 성공 응답 데코레이터 (커서 페이지네이션)
+ * Swagger에는 커서 페이지네이션 구조만 노출
+ * 실제 응답은 { statusCode: 200, message: "ok", data: { items: [...], nextCursor, hasNext } } 형태
+ */
+export const ApiOkCursorPaginatedResponseDto = <TModel extends Type<any>>(model: TModel) => {
+  return applyDecorators(
+    ApiExtraModels(model),
+    ApiResponse({
+      status: 200,
+      description: '성공',
+      schema: {
+        properties: {
+          items: { type: 'array', items: { $ref: getSchemaPath(model) } },
+          nextCursor: { type: 'number', nullable: true, example: 42 },
+          hasNext: { type: 'boolean', example: true }
+        }
+      }
+    })
+  );
+};
+
+/**
  * Swagger용 공통 성공 응답 데코레이터 (데이터 없음)
  * 응답 본문에 data가 없는 경우 사용 (예: 로그아웃)
  * 실제 응답은 { statusCode: 200, message: "ok", data: null } 형태

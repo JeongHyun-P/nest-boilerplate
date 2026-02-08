@@ -48,6 +48,7 @@ async function bootstrap() {
 
   logger.log(`Server running on port: http://localhost:${port}`);
   logger.log(`API Docs: http://localhost:${port}/api-docs`);
+  logger.log(`API Docs (JSON): http://localhost:${port}/api-docs-json`);
 }
 
 bootstrap();

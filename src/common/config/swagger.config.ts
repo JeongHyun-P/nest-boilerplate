@@ -32,14 +32,14 @@ export function setupSwagger(app: INestApplication): void {
     )
     .setVersion('1.0')
     .setContact('DevHounds', 'https://devhounds.com', 'kayn@devhounds.com')
+    .addServer(`http://localhost:${process.env.PORT || 3000}`)
     .addBearerAuth(
       {
         type: 'http',
         scheme: 'bearer',
         bearerFormat: 'JWT',
         description: 'JWT 인증 토큰 입력'
-      },
-      'access-token'
+      }
     )
     .addTag('Auth', '인증 API')
     .addTag('Users', '유저 API')
