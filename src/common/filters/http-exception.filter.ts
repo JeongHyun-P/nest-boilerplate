@@ -133,7 +133,7 @@ export class HttpExceptionFilter implements ExceptionFilter {
   }
 
   // MySQL 에러 코드별 클라이언트 메시지 매핑
-  private getQueryErrorMessage(exception: Error & { errno?: number }): string {
+  private getQueryErrorMessage(exception: Error & { errno?: number; sql?: string }): string {
     switch (exception.errno) {
       case 1062:
         return '이미 존재하는 데이터입니다.';
@@ -142,6 +142,7 @@ export class HttpExceptionFilter implements ExceptionFilter {
       case 1451:
         return '다른 데이터에서 참조 중이므로 삭제할 수 없습니다.';
       default:
+        this.logger.error(`[QueryFailedError] errno: ${exception.errno}, message: ${exception.message}, sql: ${exception.sql}`);
         return '데이터 처리 중 오류가 발생했습니다.';
     }
   }
