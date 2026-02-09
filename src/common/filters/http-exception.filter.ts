@@ -136,10 +136,13 @@ export class HttpExceptionFilter implements ExceptionFilter {
   private getQueryErrorMessage(exception: Error & { errno?: number; sql?: string }): string {
     switch (exception.errno) {
       case 1062:
+        this.logger.error(`[QueryFailedError] Duplicate entry - ${exception.message}`);
         return '이미 존재하는 데이터입니다.';
       case 1452:
+        this.logger.error(`[QueryFailedError] Foreign key violation - ${exception.message}`);
         return '참조하는 데이터가 존재하지 않습니다.';
       case 1451:
+        this.logger.error(`[QueryFailedError] Foreign key constraint - ${exception.message}`);
         return '다른 데이터에서 참조 중이므로 삭제할 수 없습니다.';
       default:
         this.logger.error(`[QueryFailedError] errno: ${exception.errno}, message: ${exception.message}, sql: ${exception.sql}`);
