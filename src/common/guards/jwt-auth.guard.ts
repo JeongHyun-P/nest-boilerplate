@@ -36,6 +36,11 @@ export class JwtAuthGuard extends AuthGuard('jwt') {
       throw new CustomException(ErrorCode.INVALID_TOKEN);
     }
 
+    // validate()에서 던진 CustomException은 그대로 전달
+    if (err instanceof CustomException) {
+      throw err;
+    }
+
     // 그 외 에러 또는 user 없음
     if (err || !user) {
       throw new CustomException(ErrorCode.UNAUTHORIZED);
