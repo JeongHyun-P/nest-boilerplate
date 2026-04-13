@@ -60,7 +60,7 @@ export class LoggingInterceptor implements NestInterceptor {
 
   intercept(context: ExecutionContext, next: CallHandler): Observable<unknown> {
     const request = context.switchToHttp().getRequest();
-    const { method, url, ip, body, headers } = request;
+    const { method, url, ip, headers } = request;
 
     // 로깅 제외 경로 체크
     const path = url.split('?')[0];
@@ -97,7 +97,8 @@ export class LoggingInterceptor implements NestInterceptor {
             duration,
             ip,
             userId,
-            body: isFileUpload ? '[FILE_UPLOAD]' : body,
+            body: request.body,
+            fileCount: isFileUpload ? (request.files?.length || 0) : 0,
             responseBody,
           });
         },
@@ -117,6 +118,7 @@ export class LoggingInterceptor implements NestInterceptor {
     ip: string;
     userId: string | number;
     body: unknown;
+    fileCount: number;
     responseBody: unknown;
   }): void {
     const {
@@ -128,6 +130,7 @@ export class LoggingInterceptor implements NestInterceptor {
       ip,
       userId,
       body,
+      fileCount,
       responseBody,
     } = params;
 
@@ -145,6 +148,9 @@ export class LoggingInterceptor implements NestInterceptor {
       if (body && typeof body === 'object' && Object.keys(body).length > 0) {
         const maskedBody = maskSensitiveData(body);
         lines.push(`  └─ Body: ${JSON.stringify(maskedBody)}`);
+      }
+      if (fileCount > 0) {
+        lines.push(`  └─ Files: ${fileCount}개`);
       }
 
       // Response Body (개발 환경만)
