@@ -5,7 +5,7 @@ import { UserResponseDto } from '../../user/dto/user.response.dto';
 import { Roles } from '../../../common/decorators/roles.decorator';
 import { Role } from '../../../common/constants/role.enum';
 import { ApiOkPaginatedResponseDto, ApiOkResponseDto } from '../../../common/decorators/api-response.decorator';
-import { PaginatedResponseDto, PaginationDto } from 'src/common/dto/pagination.dto';
+import { PaginatedResponseDto, PaginationDto } from '../../../common/dto/pagination.dto';
 
 // 관리자용 유저 관리 컨트롤러
 @ApiTags('Admin Users')

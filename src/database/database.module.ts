@@ -16,7 +16,7 @@ import { isDbLoggingEnabled } from '../common/utils/db-options.util';
         password: configService.get('database.password'),
         database: configService.get('database.database'),
         entities: [__dirname + '/../**/*.entity{.ts,.js}'],
-        synchronize: configService.get('nodeEnv') === 'development',
+        synchronize: configService.get('database.synchronize'),
         dropSchema: configService.get('database.dropSchema'),
         logging: isDbLoggingEnabled(
           configService.get('nodeEnv') || 'development',

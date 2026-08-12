@@ -4,8 +4,8 @@ import { UserService } from '../user.service';
 import { UserResponseDto } from '../dto/user.response.dto';
 import { UpdateProfileRequestDto, ChangePasswordRequestDto } from '../dto/user.request.dto';
 import { CurrentUser } from '../../../common/decorators/current-user.decorator';
-import { Roles } from 'src/common/decorators/roles.decorator';
-import { Role } from 'src/common/constants/role.enum';
+import { Roles } from '../../../common/decorators/roles.decorator';
+import { Role } from '../../../common/constants/role.enum';
 import { ApiOkResponseDto } from '../../../common/decorators/api-response.decorator';
 
 // 유저 컨트롤러

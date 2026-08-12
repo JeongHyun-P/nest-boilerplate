@@ -13,6 +13,8 @@ export const validationSchema = Joi.object({
   DB_PASSWORD: Joi.string().required(),
   DB_DATABASE: Joi.string().required(),
   DB_QUERY_LOG: Joi.string().valid('true', 'false').default('false'),
+  DB_SYNCHRONIZE: Joi.string().valid('true', 'false').default('false'),
+  DB_DROP_SCHEMA: Joi.string().valid('true', 'false').default('false'),
 
   // JWT
   JWT_SECRET: Joi.string().required(),
@@ -54,6 +56,7 @@ export default () => ({
     password: process.env.DB_PASSWORD,
     database: process.env.DB_DATABASE,
     logging: process.env.DB_QUERY_LOG || 'false',
+    synchronize: process.env.DB_SYNCHRONIZE === 'true',
     dropSchema: process.env.DB_DROP_SCHEMA === 'true',
   },
 
