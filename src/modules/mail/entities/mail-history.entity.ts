@@ -15,8 +15,8 @@ export class MailHistory extends BaseEntity {
   html: string;
 
   @Column({
-    type: 'enum',
-    enum: MailStatus,
+    type: 'varchar',
+    length: 20,
     default: MailStatus.FAILED,
     comment: '발송 상태 (success: 성공, failed: 실패, retry: 재시도 대기)',
   })
